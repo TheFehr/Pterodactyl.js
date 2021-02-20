@@ -76,8 +76,8 @@ class ClientServer extends ClientServerModel {
     public powerState(): Promise<string> {
         return new Promise(async (resolve, reject) => {
             try {
-                let res = await this.api.call(`/client/servers/${this.identifier}/utilization`);
-                resolve(res.data.attributes.state);
+                let res = await this.api.call(`/client/servers/${this.identifier}/resources`);
+                resolve(res.data.attributes.current_state);
             } catch (error) {
                 reject(error);
             }
