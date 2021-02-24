@@ -67,7 +67,7 @@ interface ServerFeatureLimits {
     allocations: number;
 }
 
-export { ServerOptions, ServerOptionsRaw, ServerLimits, ServerFeatureLimits };
+export { ServerOptions, ServerOptionsRawV1, ServerLimits, ServerFeatureLimits };
 
 class ClientServer implements ServerOptions {
     public raw: ServerOptionsRaw;
@@ -110,7 +110,7 @@ class ClientServer implements ServerOptions {
 }
 
 class ClientServerV1 implements ServerOptionsV1 {
-    public raw: ServerOptionsRaw;
+    public raw: ServerOptionsRawV1;
     public serverOwner: boolean;
     public identifier: string;
     public uuid: string;
@@ -156,7 +156,7 @@ class ClientServerV1 implements ServerOptionsV1 {
         };
     }
 
-    public toRaw(): ServerOptionsRaw {
+    public toRaw(): ServerOptionsRawV1 {
         return this.raw;
     }
 }

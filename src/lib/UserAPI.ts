@@ -1,8 +1,8 @@
 import PterodactylAPI from './index';
 import ClientServerController from './controllers/ClientServers';
 
-// import ClientServer from './client/ClientServer';
-// import ClientAccount from './client/ClientAccount';
+import ClientServer from './client/ClientServer';
+import ClientAccount from './client/ClientAccount';
 
 class UserClient extends PterodactylAPI {
     public servers: ClientServerController;
@@ -45,6 +45,10 @@ class UserClient extends PterodactylAPI {
 
     public getAccount(): Promise<ClientAccount> {
         return ClientAccount.get(this);
+    }
+
+    public getServers(): Promise<ClientServer[]> {
+        return ClientServer.getAll(this);
     }
 }
 

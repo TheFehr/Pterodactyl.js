@@ -1,6 +1,6 @@
 import UserAPI from '../UserAPI';
 
-import ClientServerModel, { ServerOptionsRaw, } from '../models/ClientServer';
+import { ClientServerV1, ServerOptionsRawV1 } from '../models/ClientServer';
 import Pagination, { PaginationOptionsRaw, } from '../models/Pagination';
 
 import WebSocket from '../utils/WebSocket';
@@ -15,11 +15,11 @@ interface WebSocketInfo {
     socket: string;
 }
 
-class ClientServer extends ClientServerModel {
+class ClientServer extends ClientServerV1 {
     private api: UserAPI;
     public pagination?: Pagination;
 
-    constructor(api: UserAPI, data: ServerOptionsRaw, paginationOptions?: PaginationOptionsRaw) {
+    constructor(api: UserAPI, data: ServerOptionsRawV1, paginationOptions?: PaginationOptionsRaw) {
         super(data);
         this.api = api;
         if (paginationOptions) this.pagination = new Pagination(paginationOptions);
@@ -83,8 +83,8 @@ class ClientServer extends ClientServerModel {
     public powerState(): Promise<string> {
         return new Promise(async (resolve, reject) => {
             try {
-                let res = await this.api.call(`/client/servers/${this.identifier}/utilization`);
-                resolve(res.data.attributes.state);
+                let res = await this.api.call(`/client/servers/${this.identifier}/resources`);
+                resolve(res.data.attributes.current_state);
             } catch (error) {
                 reject(error);
             }
@@ -94,7 +94,7 @@ class ClientServer extends ClientServerModel {
     public powerAction(signal: 'start' | 'stop' | 'restart' | 'kill'): Promise<void> {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.api.call(`/client/servers/${this.identifier}/power`, 'POST', { signal });
+                await this.api.call(`/client/servers/${this.identifier}/power`, 'POST', { signal }, true);
                 resolve();
             } catch (error) {
                 reject(error);
@@ -103,47 +103,19 @@ class ClientServer extends ClientServerModel {
     }
 
     public start(): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                await this.api.call(`/client/servers/${this.identifier}/power`, 'POST', { signal: 'start' });
-                resolve();
-            } catch (error) {
-                reject(error);
-            }
-        });
+        return this.powerAction('start');
     }
 
     public stop(): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                await this.api.call(`/client/servers/${this.identifier}/power`, 'POST', { signal: 'stop' });
-                resolve();
-            } catch (error) {
-                reject(error);
-            }
-        });
+        return this.powerAction('stop');
     }
 
     public restart(): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                await this.api.call(`/client/servers/${this.identifier}/power`, 'POST', { signal: 'restart' });
-                resolve();
-            } catch (error) {
-                reject(error);
-            }
-        });
+        return this.powerAction('restart');
     }
 
     public kill(): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                await this.api.call(`/client/servers/${this.identifier}/power`, 'POST', { signal: 'kill' });
-                resolve();
-            } catch (error) {
-                reject(error);
-            }
-        });
+        return this.powerAction('kill');
     }
 
     public databases(): Promise<number> {
@@ -168,7 +140,7 @@ class ClientServer extends ClientServerModel {
     public sendCommand(command: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.api.call(`/client/servers/${this.identifier}/command`, 'POST', { command });
+                await this.api.call(`/client/servers/${this.identifier}/command`, 'POST', { command }, true);
                 resolve();
             } catch (error) {
                 reject(error);
